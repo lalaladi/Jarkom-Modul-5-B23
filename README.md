@@ -521,14 +521,50 @@ date -s "19 DEC 2023 18:00:00" <br>
 ## **Soal Nomor 6**
 Lalu, karena ternyata terdapat beberapa waktu di mana network administrator dari WebServer tidak bisa stand by, sehingga perlu ditambahkan rule bahwa akses pada hari Senin - Kamis pada jam 12.00 - 13.00 dilarang (istirahat maksi cuy) dan akses di hari Jumat pada jam 11.00 - 13.00 juga dilarang (maklum, Jumatan rek).<br>
 <br>**Langkah Penyelesaian Soal 6 :** <br>
+lakukan di Sein dan Stark dan karena merupakan lanjutan dari soal sebelumnya maka tinggal tambahkan :
+```bash
+# Mengizinkan koneksi kecuali pada waktu istirahat
+iptables -A INPUT -m time --weekdays Mon,Tue,Wed,Thu --timestart 12:00 --timestop 13:01 -j REJECT
+# Mengizinkan koneksi kecuali pada waktu Jumatan
+iptables -A INPUT -m time --weekdays Fri --timestart 11:00 --timestop 13:01 -j REJECT
+```
+**Testing**
+![6_1](https://github.com/lalaladi/praksisop2/assets/90541607/0347d11a-a7d8-4535-91a9-89a238df225c)
+![6_11](https://github.com/lalaladi/praksisop2/assets/90541607/37fa0394-242e-47a7-9de2-b88f70c170c2)
+![6_2](https://github.com/lalaladi/praksisop2/assets/90541607/4e6f11d8-5513-4a12-910c-a6c580704660)
+![6_22](https://github.com/lalaladi/praksisop2/assets/90541607/903575f9-24f4-4497-b966-c4072beff498)
+![6_3](https://github.com/lalaladi/praksisop2/assets/90541607/fc7d2acf-e1e4-4678-bddb-b8d9240c6902)
+![6_33](https://github.com/lalaladi/praksisop2/assets/90541607/ccdd072e-27dc-43b9-bae7-961c6668319a)
 
 ## **Soal Nomor 7**
 Karena terdapat 2 WebServer, kalian diminta agar setiap client yang mengakses Sein dengan Port 80 akan didistribusikan secara bergantian pada Sein dan Stark secara berurutan dan request dari client yang mengakses Stark dengan port 443 akan didistribusikan secara bergantian pada Sein dan Stark secara berurutan.<br>
 <br>**Langkah Penyelesaian Soal 7 :** <br>
+* Sein : <br>
+```bash
+iptables -A PREROUTING -t nat -p tcp --dport 80 -d 10.20.4.2 -m statistic --mode nth --every 2 --packet 0 -j DNAT --to-destination 10.20.4.2:80
+iptables -A PREROUTING -t nat -p tcp --dport 443 -d 10.20.0.14 -j DNAT --to-destination 10.20.4.2:443
+```
+* Stark : <br>
+```bash
+iptables -A PREROUTING -t nat -p tcp --dport 80 -d 10.20.4.2-j DNAT --to-destination 10.20.0.14:80
+iptables -A PREROUTING -t nat -p tcp --dport 443 -d 10.20.0.14 -m statistic --mode nth --every 2 --packet 0 -j DNAT --to-destination 10.20.0.14:443
+```
 
 ## **Soal Nomor 8**
 Karena berbeda koalisi politik, maka subnet dengan masyarakat yang berada pada Revolte dilarang keras mengakses WebServer hingga masa pencoblosan pemilu kepala suku 2024 berakhir. Masa pemilu (hingga pemungutan dan penghitungan suara selesai) kepala suku bersamaan dengan masa pemilu Presiden dan Wakil Presiden Indonesia 2024.<br>
 <br>**Langkah Penyelesaian Soal 8 :** <br>
+Pada Sein(10.20.4.2) dan Stark(10.20.0.14) : <br>
+```bash
+iptables -A INPUT -s 10.20.0.0/30 -m time --datestart 2023-11-28 --datestop 2024-02-10 -j DROP
+```
+**Testing**
+date -s "28 MAR 2024 14:00:00" <br>
+![8_1](https://github.com/lalaladi/praksisop2/assets/90541607/71fad5cd-2ceb-435d-b815-d8f7177b7fd2)
+![8_11](https://github.com/lalaladi/praksisop2/assets/90541607/bb06a133-5a5f-48d1-8b0f-5bf0f3353f96)
+<br>
+date -s "09 FEB 2024 00:00:00"
+![8_2](https://github.com/lalaladi/praksisop2/assets/90541607/0a844fbb-7f75-4cc3-872f-38088ac79b23)
+![8_22](https://github.com/lalaladi/praksisop2/assets/90541607/a8ed7bf8-35b5-46e8-820a-e62ab3d4b3a1)
 
 ## **Soal Nomor 9**
 Sadar akan adanya potensial saling serang antar kubu politik, maka WebServer harus dapat secara otomatis memblokir  alamat IP yang melakukan scanning port dalam jumlah banyak (maksimal 20 scan port) di dalam selang waktu 10 menit. 
