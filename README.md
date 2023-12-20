@@ -570,7 +570,28 @@ date -s "09 FEB 2024 00:00:00"
 Sadar akan adanya potensial saling serang antar kubu politik, maka WebServer harus dapat secara otomatis memblokir  alamat IP yang melakukan scanning port dalam jumlah banyak (maksimal 20 scan port) di dalam selang waktu 10 menit. 
 (clue: test dengan nmap) <br>
 <br>**Langkah Penyelesaian Soal 9 :** <br>
+Pada Sein atau Stark :
+```bash
+iptables -N PORTSCAN
+iptables -A INPUT -m recent --update --seconds 600 --hitcount 20 --name portscan --rsource -j DROP
+iptables -A FORWARD -m recent --update --seconds 600 --hitcount 20 --name portscan --rsource -j DROP
+iptables -A INPUT -m recent --name portscan --set -j ACCEPT
+iptables -A FORWARD -m recent --name portscan --set -j ACCEPT
+```
+Penjelasan : <br>
+* Aturan pertama membuat chain (PORTSCAN) yang akan digunakan untuk mendeteksi port scanning.<br>
+* Aturan kedua mengupdate 'hit count' dalam 'recent table' jika terjadi scanning dalam rentang waktu 10 menit. Jika jumlah scan melebihi 20, maka alamat IP tersebut akan diblokir. <br>
+
+**Testing pada GrabForest :** 
+<br>
+ping 10.20.4.2 => nantinya ping hanya akan sampai 20 kali saja
+![9](https://github.com/lalaladi/praksisop2/assets/90541607/fd1536e6-aee2-4f63-b7ee-89a8b1f7fe97)
 
 ## **Soal Nomor 10**
 Karena kepala suku ingin tau paket apa saja yang di-drop, maka di setiap node server dan router ditambahkan logging paket yang di-drop dengan standard syslog level. <br>
 <br>**Langkah Penyelesaian Soal 10 :** <br>
+```bash
+iptables -A INPUT -j LOG --log-prefix "DROP_INPUT: " --log-level 4
+iptables -A FORWARD -j LOG --log-prefix "DROP_FORWARD: " --log-level 4
+iptables -A OUTPUT -j LOG --log-prefix "DROP_OUTPUT: " --log-level 4
+```
