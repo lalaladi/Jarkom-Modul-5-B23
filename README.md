@@ -47,6 +47,7 @@ apt-get update
 apt-get install netcat
 ```
 Server: ```bash nc -l -p [port] ```
+<br>
 Client: ```bash nc [ip server] [port] ```
 <br>
 
