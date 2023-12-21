@@ -524,11 +524,12 @@ Lalu, karena ternyata terdapat beberapa waktu di mana network administrator dari
 lakukan di Sein dan Stark dan karena merupakan lanjutan dari soal sebelumnya maka tinggal tambahkan :
 ```bash
 # Mengizinkan koneksi kecuali pada waktu istirahat
-iptables -A INPUT -m time --weekdays Mon,Tue,Wed,Thu --timestart 12:00 --timestop 13:01 -j REJECT
+iptables -A INPUT -m time --weekdays Mon,Tue,Wed,Thu --timestart 12:00 --timestop 13:00 -j REJECT
 # Mengizinkan koneksi kecuali pada waktu Jumatan
-iptables -A INPUT -m time --weekdays Fri --timestart 11:00 --timestop 13:01 -j REJECT
+iptables -A INPUT -m time --weekdays Fri --timestart 11:00 --timestop 13:00 -j REJECT
 ```
 **Testing**
+<br>
 ![6_1](https://github.com/lalaladi/praksisop2/assets/90541607/0347d11a-a7d8-4535-91a9-89a238df225c)
 ![6_11](https://github.com/lalaladi/praksisop2/assets/90541607/37fa0394-242e-47a7-9de2-b88f70c170c2)
 ![6_2](https://github.com/lalaladi/praksisop2/assets/90541607/4e6f11d8-5513-4a12-910c-a6c580704660)
